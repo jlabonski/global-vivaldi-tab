@@ -1,3 +1,18 @@
+const openOptions = {
+  focused: true,
+  url: 'about:blank',
+  focused: true
+};
+
+const incognitoOptions = {
+  ...openOptions,
+  incognito: true
+};
+
+const refocus = (win) => {
+  chrome.windows.update(win.id, { focused: true });
+}
+
 chrome.commands.onCommand.addListener(function(command) {
   if (command === 'new-tab') {
     // First we need to focus the current window
@@ -8,15 +23,10 @@ chrome.commands.onCommand.addListener(function(command) {
       });
     });
   } else if (command === 'new-window') {
-    // Simply passing focused doesn't seem to work so try harder
-    chrome.windows.create({focused: true}, function(win){
-      chrome.windows.update(win.id, {focused: true});
-    });
+    chrome.windows.create(openOptions, refocus);
   } else if (command === 'new-incognito-window') {
     // If you use this, you need to check "Allow in incognito" checkbox of the
     // extension
-    chrome.windows.create({focused: true, incognito: true}, function(win){
-      chrome.windows.update(win.id, {focused: true});
-    });
+    chrome.windows.create(incognitoOptions, refocus);
   }
 });
